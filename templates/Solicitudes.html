@@ -1,0 +1,45 @@
+{% extends 'appi.html' %}
+
+{% block title %}Solicitudes{% endblock %}
+
+{% block contenido %}
+
+<h2>Solicitudes de amistad recibidas</h2>
+<br>
+
+<div class="contenedor_amigos">
+    {% if requests|length > 0 %}
+        {% for user in requests %}
+            <div class="contenido_amigos">
+                <img 
+                    src="{{ url_for('static', filename='storage/public/' + user.foto_perfil) if user.foto_perfil else 'https://via.placeholder.com/100' }}" 
+                    alt="{{ user.nombre }}" 
+                    class="foto_perfil_amigos" 
+                    style="width: 150px; height: 150px; object-fit: cover">
+                <div class="nombre_solicitud">
+                    <h6 class="mb-55">{{ user.nombre }}</h6>
+                </div>
+                <button class="aceptar-solicitud" onclick="acceptFriendRequest('{{ user.id_usuario }}')">Aceptar</button>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No hay solicitudes por el momento.</p>
+    {% endif %}
+</div>
+
+<script>
+    function acceptFriendRequest(senderId) {
+        fetch(`/aceptarSolicitud/${senderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Flask no utiliza CSRF por defecto, pero si tienes CSRF habilitado, ajusta el token correctamente
+                }
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error(error));
+    }
+</script>
+
+{% endblock %}

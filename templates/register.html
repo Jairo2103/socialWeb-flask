@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Pagina social</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="background-image"></div>
+    <div class="container">
+
+        <div class="form-container">
+            <h2>REGISTER</h2>
+            <p>Sign up to get started with our services</p>
+            <form action="{{ url_for('register') }}" method="POST">
+
+                <!-- Nombres -->
+                <div class="input-group">
+                    <label for="name" style="vertical-align: inherit;font-size: small;">Nombres:
+                        <input type="text" name="Nombres" id="name" style="width: 160%;">
+                    </label>
+                </div>
+
+                <!-- Apellidos -->
+                <div class="input-group">
+                    <label for="firstname" style="vertical-align: inherit;font-size: small;">Apellidos:
+                        <input type="text" name="Apellidos" id="lastname" style="width: 160%;">
+                    </label>
+                </div>
+
+                <!-- Fecha de nacimiento -->
+                <div class="input-group">
+                    <label for="day">Día:
+                        <select class="custom-select-1" name="birthday_day" id="dia">
+                            {% for i in range(1, 32) %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    
+                    
+                    <label for="month">Mes:
+                        <select class="custom-select-2" name="birthday_month" id="mes">
+                            {% set month_names = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] %}
+                            {% for i in range(12) %}
+                                <option value="{{ i + 1 }}">{{ month_names[i] }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    
+                    <label for="year">Año:
+                        <select class="custom-select-3" name="birthday_year" id="year" style="width: 120%;">
+                            {% for year in range(2024, 1904, -1) %}
+                                <option value="{{ year }}">{{ year }}</option>
+                            {% endfor %}
+                        </select> 
+                    </label>
+                    
+                </div>
+
+                <!-- Género -->
+                <div class="input-group">Género:
+                    <div class="generos" style="margin-left: 30px;">
+                        <label for="genero" class="sex" id="sex-fem">Femenino
+                            <input type="radio" id="sex-femenino" name="sex" value="Femenino" style="margin: 5px;"> 
+                        </label>
+                        <label for="genero" id="sex-male" class="sex">Masculino
+                            <input type="radio" value="Masculino" name="sex" id="sex-masculino" style="margin: 5px;">
+                        </label>
+                        <label for="genero" id="sex-oth" class="sex">Personalizado
+                            <input type="radio" value="Others" name="sex" id="sex-others" style="margin: 5px;">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Correo Electrónico -->
+                <div class="input-group">
+                    <label for="email">
+                        <input type="email" name="email" id="correo" autocomplete="username" placeholder="Ingresa tu correo"
+                            style="width: 220%;">
+                    </label>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="input-group">
+                    <label for="password">
+                        <input type="password" name="password" id="password" autocomplete="current-password" placeholder="Contraseña Nueva"
+                            style="width: 220%;">
+                    </label>
+                </div>
+
+                <!-- Confirmar Contraseña -->
+                <div class="input-group">
+                    <label for="password_confirmation">
+                        <input type="password" name="password_confirmation" id="password_confirmation" autocomplete="new-password" placeholder="Confirmar Contraseña" style="width: 220%;">
+                    </label>
+                </div>
+
+                <!-- Botón de Registro -->
+                <div class="input-group">
+                    <label for="button">
+                        <button> Registrarte </button>
+                    </label>
+                    <br>
+                    <a href="{{ url_for('login') }}">¿Ya tienes una cuenta?</a>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="info-container">
+            <p>Join us and start exploring new opportunities!<br>Sign up now to begin your journey!</p>
+            <img src="{{ url_for('static', filename='css/imgen/Grupoparque.jpeg') }}" alt="Welcome Image">
+        </div>
+
+    </div>
+
+    <!-- Mostrar errores de formulario -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container">
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    {{ Enviar-Solicitudes }}
+{% endblock %}
+
+{% block contenido %}
+    <h2>Enviar solicitud de amistad</h2>
+    <br>
+
+    <div class="contenedor_amigos">
+        {% for user in users %}
+            <div class="contenido_amigos">
+                <img src="{{ url_for('static', filename='public/' + user.foto_perfil) if user.foto_perfil else 'https://via.placeholder.com/100' }}"
+                    alt="{{ user.nombre }}"
+                    class="foto_perfil_amigos"
+                    style="width: 150px; height: 150px; object-fit: cover">
+                <div class="nombre_solicitud">
+                    <h6 class="mb-55">{{ user.nombre }}</h6>
+                </div>
+                <button class="enviar-solicitud" onclick="sendFriendRequest('{{ user.id_usuario }}')">Enviar Solicitud</button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        function sendFriendRequest(receiverId) {
+            fetch(`/enviarSolicitud/${receiverId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.message === 'Solicitud enviada exitosamente') {
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al enviar la solicitud');
+                });
+        }
+    </script>
+{% endblock %}
