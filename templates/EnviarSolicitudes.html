@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'appi.html' %}
 
 {% block title %}
     {{ Enviar-Solicitudes }}
@@ -9,9 +9,10 @@
     <br>
 
     <div class="contenedor_amigos">
+    {% if requests|length > 0 %}
         {% for user in users %}
             <div class="contenido_amigos">
-                <img src="{{ url_for('static', filename='public/' + user.foto_perfil) if user.foto_perfil else 'https://via.placeholder.com/100' }}"
+                <img src="/uploads/profile/{{user.foto_perfil}}"
                     alt="{{ user.nombre }}"
                     class="foto_perfil_amigos"
                     style="width: 150px; height: 150px; object-fit: cover">
@@ -21,11 +22,14 @@
                 <button class="enviar-solicitud" onclick="sendFriendRequest('{{ user.id_usuario }}')">Enviar Solicitud</button>
             </div>
         {% endfor %}
+    {% else %}
+        <p>No hay solicitudes por el momento.</p>
+    {% endif %}
     </div>
 
     <script>
         function sendFriendRequest(receiverId) {
-            fetch(`/enviarSolicitud/${receiverId}`, {
+            fetch(`/enviar_solicitud/${receiverId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

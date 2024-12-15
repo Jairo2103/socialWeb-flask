@@ -21,10 +21,10 @@
 
     <header class="profile-header">
         <div class="cover-photo position-relative">
-            {% if current_user.foto_portada %}
-            <img src="{{ url_for('static', filename='uploads/covers/' + current_user.foto_portada) }}" class="w-100"
+            
+            <img src="{{ url_for('download_file', filename='covers/' + (usuario.foto_portada if usuario.foto_portada else 'default_cover.jpg')) }}" class="w-100"
                 style="height: 350px; object-fit: cover;" alt="Foto de portada">
-            {% endif %}
+            
             <button type="button" class="btn btn-primary position-absolute bottom-0 end-0 m-3" data-bs-toggle="modal"
                 data-bs-target="#portadaModal">
                 Agregar foto de portada</button>
@@ -32,7 +32,7 @@
 
         <div class="profile-info d-flex align-items-center p-3">
             <div class="position-relative">
-                <img src="{{  url_for('static', filename='uploads/profile/' + current_user.foto_perfil) if current_user.foto_perfil else 'https://via.placeholder.com/100' }}"
+                <img src="{{ url_for('download_file', filename='profile/' + (usuario.foto_perfil if usuario.foto_perfil else 'default_cover.jpg')) }}"
                     alt="Foto de perfil" class="profile-photo rounded-circle"
                     style="width: 100px; height: 100px; object-fit: cover;">
                 <button class="btn btn-sm btn-primary position-absolute bottom-0 end-0" data-bs-toggle="modal"
@@ -42,15 +42,14 @@
             </div>
 
             <div class="ms-3">
-                <h1 class="profile-name">{{ current_user.nombre_usuario }} {{current_user.apellidos }}</h1>
+                <h1 class="profile-name">{{ current_user.nombre }} {{current_user.apellidos }}</h1>
             </div>
         </div>
 
         <nav class="profile-nav mt-3">
             <ul class="nav justify-content-center border-bottom">
                 <li class="nav-item">
-                    <a class="nav-link {{ 'active' if tab == 'publicaciones' }}"
-                        href="?tab=publicaciones">Publicaciones</a>
+                    <a class="nav-link {{ 'active' if tab == 'publicaciones' }}"href="?tab=publicaciones">Publicaciones</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ 'active' if tab == 'informacion' }}" href="?tab=informacion">Información</a>
@@ -83,9 +82,9 @@
                 <div class="card mb-3">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
-                            <img src="{{ current_user.foto_perfil if current_user.foto_perfil else 'https://via.placeholder.com/100' }}"
+                            <img src="{{ url_for('download_file', filename='profile/' +  (usuario.foto_perfil if usuario.foto_perfil else 'https://via.placeholder.com/100')) }}"
                                 class="rounded-circle me-2" style="width: 40px;height: 40px; object-fit: cover;">
-                            <h6 class="mb-0">{{ current_user.nombre }}</h6>
+                            <h6 class="mb-0">{{ usuario.nombre }}</h6>
                             <br><br>
                             <small class="text-muted">
                                 {{ publicacion.fecha_publicacion.strftime('%b %d, %Y') }}
@@ -93,7 +92,7 @@
                         </div>
                         <p>{{ publicacion.contenido }}</p>
                         {% if publicacion.imagen %}
-                        <img src="{{ url_for('static', filename='uploads/post' + publicacion.imagen) }}"
+                        <img src="/uploads/posts/{{ publicacion.imagen }}"
                             class="img-fluid rounded mb-3">
                         {% endif %}
 
@@ -105,6 +104,7 @@
                 {% endif %}
             </div>
             {% elif tab == 'informacion' %}
+            
             <div id="informacion" class="info-container">
                 <h3 class="titulo">Información del Usuario</h3>
                 <div class="info-item">
@@ -131,15 +131,17 @@
             {% elif tab == 'amigos' %}
             <div id="amigos">
                 <h3>Amigos</h3>
+                <br>
                 {% if amigos %}
                 <div class="contenedor-amigos"
                     style="display: flex;margin: 2.5%;position: relative;display: flex;width: 100%;height: 20%;flex-direction: row;flex-wrap: wrap;">
                     {% for amigo in amigos %}
                     <div class="contenido-amigos"
                         style="position: relative;padding: 10px;width: 20%;align-content: center;margin: 20px;">
-                        <img src="{{ amigos.foto_perfil or 'https://via.placeholder.com/100' }}"
+                        <img src="/uploads/profile/{{amigo.foto_perfil}}"
                             class="foto_perfil_amigos" style="width: 150px; height: 150px; object-fit: cover">
-                        <p>{{ amigos.nombre }} {{ amigos.apellidos }}</p>
+                        <p>{{ amigo.nombre }} {{ amigo.apellidos }}</p>
+                        <a href="{{ url_for('eliminar_amigo', amigo_id=amigo.id_usuario) }}" class="btn btn-danger btn-sm">Eliminar</a>
                     </div>
                     {% endfor %}
                 </div>
@@ -155,12 +157,12 @@
                     {% if fotos %}
                     {% for foto in fotos %}
                     <div class="col-md-3 mb-3">
-                        <img src="{{ url_for('static', filename='uploads/' + foto.imagen) }}" class="img-thumbnail"
-                            alt="Foto">
+                        <img src="{{ url_for('download_file', filename='posts/' + (foto.imagen)) }}" class="img-thumbnail" alt="Foto">
                     </div>
                     {% endfor %}
                     {% else %}
                     <p>No hay fotos disponibles.</p>
+                    
                     {% endif %}
                 </div>
             </div>
@@ -179,14 +181,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ url_for('actualizar_foto_perfil') }}" method="POST"
-                    enctype="multipart/form-data">
+                <form action="{{ url_for('actualizar_foto_perfil') }}" method="POST" enctype="multipart/form-data">
                     
                     <div class="mb-3">
-                        <label for="foto_perfil" class="form-label">Seleccionar
-                            foto</label>
-                        <input type="file" class="form-control" id="foto_perfil" name="foto_perfil" accept="image/*"
-                            required>
+                        <label for="foto_perfil" class="form-label">Seleccionarfoto</label>
+                        <input type="file" class="form-control" id="foto_perfil" name="foto_perfil" accept="image/*" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </form>
@@ -233,7 +232,7 @@
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre</label>
                         <input type="text" class="form-control" id="nombre" name="nombre"
-                            value="{{ current_user.Nombre_usuario }}" required>
+                            value="{{ current_user.nombre }}" required>
                     </div>
                     <div class="mb-3">
                         <label for="apellidos" class="form-label">Apellidos</label>

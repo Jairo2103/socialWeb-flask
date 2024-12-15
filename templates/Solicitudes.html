@@ -11,13 +11,12 @@
     {% if requests|length > 0 %}
         {% for user in requests %}
             <div class="contenido_amigos">
-                <img 
-                    src="{{ url_for('static', filename='storage/public/' + user.foto_perfil) if user.foto_perfil else 'https://via.placeholder.com/100' }}" 
+                <img src="/uploads/profile/{{user.foto_perfil}}"
                     alt="{{ user.nombre }}" 
                     class="foto_perfil_amigos" 
                     style="width: 150px; height: 150px; object-fit: cover">
                 <div class="nombre_solicitud">
-                    <h6 class="mb-55">{{ user.nombre }}</h6>
+                    <h6 class="mb-55">{{ user.nombre }} {{user.apellido}}</h6>
                 </div>
                 <button class="aceptar-solicitud" onclick="acceptFriendRequest('{{ user.id_usuario }}')">Aceptar</button>
             </div>
@@ -29,7 +28,7 @@
 
 <script>
     function acceptFriendRequest(senderId) {
-        fetch(`/aceptarSolicitud/${senderId}`, {
+        fetch(`/aceptar_solicitud/${senderId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -32,8 +32,8 @@
 <div class="card mb-3">
     <div class="card-body">
         <div class="d-flex align-items-center">
-            <img src="/static/css/imgen/ciudadAtardecer.jpeg" alt="Usuario" class="rounded-circle me-2"
-                style="width: 40px; height: 40px;">
+            <img src="{{ url_for('download_file', filename='profile/' + (current_user.foto_perfil)) }}" alt="Usuario"
+                class="rounded-circle me-2" style="width: 40px; height: 40px;">
             <input type="text" class="form-control" data-bs-toggle="modal" data-bs-target="#publicacionesModal"
                 placeholder="¿Qué estás pensando?" style="border-radius: 20px;">
         </div>
@@ -50,14 +50,14 @@
     <div class="card mb-3">
         <div class="card-body">
             <div class="d-flex align-items-center mb-2">
-                <img src="{{ publicacion.foto_perfil or 'https://via.placeholder.com/100' }}"
-                    alt="{{ publicacion.usuario_nombre }}" class="rounded-circle me-2"
-                    style="width: 40px; height: 40px;">
+                <img src="/uploads/profile/{{publicacion.foto_perfil}}" alt="{{ publicacion.usuario_nombre }}"
+                    class="rounded-circle me-2" style="width: 40px; height: 40px;">
                 <h6 class="mb-0">{{ publicacion.usuario_nombre }}</h6>
             </div>
             <p>{{ publicacion.contenido }}</p>
             {% if publicacion.imagen %}
-            <img src="/{{ publicacion.imagen }}" alt="Imagen de publicación" class="img-fluid rounded mb-3">
+            <img src="/uploads/posts/{{ publicacion.imagen }}" alt="Imagen de publicación"
+                class="img-fluid rounded mb-3">
             {% endif %}
 
 
@@ -105,7 +105,7 @@
 
                 {% for comentario in comentarios.get(publicacion.id_publicacion, []) %}
                 <div class="d-flex align-items-center mb-2">
-                    <img src="{{ comentario.foto_perfil or 'https://via.placeholder.com/100' }}"
+                    <img src="/uploads/profile/{{comentario.foto_perfil}}"
                         class="rounded-circle me-2" style="width: 30px; height: 30px;">
                     <div>
                         <h6 class="mb-0">{{ comentario.usuario_nombre or 'Usuario desconocido' }}</h6>
@@ -147,7 +147,7 @@
             <div class="modal-header">
                 <h5 class="modal-title">Usuarios que reaccionaron</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                    <span class="close" aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
@@ -177,8 +177,8 @@
             }
         }
 
-        function obtenerReacciones(idPublicacion) {
-            return fetch(`/reacciones/${idPublicacion}`)
+        function obtenerReacciones(id_Publicacion) {
+            return fetch(`/reacciones/${id_Publicacion}`)
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error('No se pudieron obtener las reacciones.');
@@ -189,29 +189,37 @@
 
         function renderizarReacciones(reacciones) {
             let html = '';
-            reacciones.forEach((usuario) => {
+            // Iteramos sobre las reacciones y las agregamos a la lista UL
+            reacciones.forEach((reaccion) => {
                 html += `
-            <div class="d-flex align-items-center mb-2">
-            <img 
-            src="${usuario.foto_perfil ? '/storage/public/' + usuario.foto_perfil : 'https://via.placeholder.com/100'}" 
-            alt="${usuario.usuario_nombre}" 
-            class="rounded-circle me-2" 
-            style="width: 40px; height: 40px; margin-top: 10px; object-fit: cover;">
-            <h6 class="mb-0">${usuario.usuario_nombre} reaccionó con ${usuario.reaccion}</h6>
-            </div>
+                <li class="d-flex align-items-center mb-2">
+                    <img 
+                        src="/uploads/profile/${reaccion.foto_perfil}" 
+                        alt="${reaccion.usuario_nombre}" 
+                        class="rounded-circle me-2" 
+                        style="width: 40px; height: 40px; margin-top: 10px; object-fit: cover;">
+                    <h6 class="mb-0">${reaccion.usuario_nombre} reaccionó con ${reaccion.reaccion}</h6>
+                </li>
             `;
             });
-            usuariosReaccionesContainer.innerHTML = html;
+            usuariosReaccionesContainer.innerHTML = html;  // Asigna el HTML generado al contenedor UL
         }
+
 
         document.addEventListener('click', function (e) {
             if (e.target && e.target.id === 'ver-reacciones') {
                 e.preventDefault();
-                const idPublicacion = e.target.dataset.idPublicacion;
+                const id_Publicacion = e.target.dataset.idPublicacion;
 
-                obtenerReacciones(idPublicacion)
-                    .then(renderizarReacciones)
-                    .then(mostrarModal)
+                obtenerReacciones(id_Publicacion)
+                    .then((data) => {
+                        if (!Array.isArray(data.reacciones)) {
+                            throw new Error('El formato de las reacciones no es válido.');
+                        }
+                        return data.reacciones;
+                    })
+                    .then(renderizarReacciones)  // Muestra las reacciones en el modal
+                    .then(mostrarModal)  // Muestra el modal
                     .catch((error) => {
                         alert(error.message);
                         console.error('Error al obtener las reacciones:', error);
@@ -220,6 +228,15 @@
 
             if (e.target && e.target.classList.contains('close')) {
                 ocultarModal();
+            }
+        });
+
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('close')) {
+                const modalReacciones = document.getElementById('modal-reacciones');
+                if (modalReacciones) {
+                    modalReacciones.style.display = 'none';  // Ocultar el modal
+                }
             }
         });
     });

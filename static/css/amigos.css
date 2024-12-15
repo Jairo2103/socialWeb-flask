@@ -473,6 +473,51 @@ a.text-decoration-none:hover {
     color: rgb(29, 29, 29);
 }
 
+.list-unstyled {
+    padding-left: 0;
+    list-style: none;
+    font-size: medium;
+    color: #ffffff;
+    background: #2a2222;
+}
+
+.list-unstyled:hover{
+    padding-left: 0;
+    list-style: none;
+    font-size: medium;
+    color: #1d1c1c;
+    background: #f3f3f3;
+}
+
+a.text-decoration-none {
+    font-size: large;
+    color: #ffffff;
+    margin-left: 10px;
+}
+
+a.text-decoration-none:hover {
+    text-decoration: underline;
+    color: #202020;
+}
+
+
+a.text-decoration-none {
+    font-size: large;
+    color: #ffffff;
+    margin-left: 10px;
+}
+
+#Search-result:hover {
+    background-color: #f7f6f6;
+    color: rgb(29, 29, 29);
+}
+
+
+
+
+
+
+
 
 
 

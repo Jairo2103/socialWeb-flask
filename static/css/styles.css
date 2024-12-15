@@ -2,11 +2,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100%;
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-  margin: 0%;
-  
+  min-height: 100vh; /* Para que ocupe toda la altura de la ventana */
+  margin: 0; /* Elimina el margen por defecto */
+  background-size: cover;
+  background-position: center;
 }
 
 .background-image {
@@ -15,7 +14,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('imgen/ciudad.jpg'); /* URL de la imagen de fondo */
+  background-image: url('imgen/darkcity.jpg'); /* URL de la imagen de fondo */
   background-size: cover;
   background-position: center;
   z-index: -1;
@@ -43,6 +42,7 @@ body {
   margin-top: 8px;
   margin-bottom: 20px;
 }
+
 
 .input-group {
   display: flex;
@@ -72,8 +72,8 @@ body {
   width: 70%;
   padding: 10px;
   margin-top: 10px;
-  background-color: #6b3ce9;
-  color: white;
+  background-color: #46494e;
+  color: rgb(255, 255, 255);
   font-size: 16px;
   font-weight: bold;
   border: none;
@@ -84,7 +84,7 @@ body {
 }
 
 .login-btn:hover {
-  background-color: #5a32c9;
+  background-color: rgb(88, 88, 88);
 }
 
 .social-login {
@@ -121,7 +121,7 @@ body {
 }
 
 .google {
-  background-color: #dd6f65;
+  background-color: #9f9f9fd0;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -133,18 +133,12 @@ body {
 }
 
 .facebook {
-  background-color: #8694e4;
+  background-color: #9f9f9fd0;
   display: flex;
   align-items: center;
   gap: 10px;
 }
-.social-btn.google {
-  border-color: #d66a61;
-}
 
-.social-btn.facebook {
-  border-color: #3b5998;
-}
 
 .social-btn:hover {
   background-color: #f0f0f0;
@@ -152,7 +146,7 @@ body {
 
 .welcome-container {
   width: 50%;
-  background-color: #6b3ce9;
+  background-color: #676767;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -178,152 +172,6 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Estilos Generales */
-* {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-font-family: Arial, sans-serif;
-}
-
-body {
-background-color: #f0f2f5;
-}
-
-.container {
-width: 90%;
-max-width: 1000px;
-margin: auto;
-}
-
-/* Barra Superior */
-.top-bar {
-background-color: #3b5998;
-color: white;
-display: flex;
-align-items: center;
-padding: 10px;
-justify-content: space-between;
-}
-
-.search-bar {
-padding: 5px;
-width: 200px;
-border: none;
-border-radius: 20px;
-}
-
-.top-icons i {
-margin: 0 10px;
-font-size: 18px;
-cursor: pointer;
-}
-
-/* Sección de Portada y Perfil */
-.profile-header {
-background-color: white;
-border-radius: 8px;
-margin-top: 20px;
-overflow: hidden;
-}
-
-.cover-photo {
-background-color: #d9d9d9;
-height: 200px;
-position: relative;
-}
-
-.add-cover-photo {
-position: absolute;
-bottom: 10px;
-right: 10px;
-background-color: #ffffff;
-padding: 5px 10px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-}
-
-.profile-info {
-display: flex;
-align-items: center;
-padding: 20px;
-}
-
-.profile-photo {
-width: 100px;
-height: 100px;
-border-radius: 50%;
-border: 4px solid white;
-}
-
-.profile-name {
-margin-left: 20px;
-font-size: 24px;
-font-weight: bold;
-}
-
-.add-story, .edit-profile {
-margin-left: auto;
-padding: 10px 15px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-background-color: #1877f2;
-color: white;
-font-weight: bold;
-display: flex;
-align-items: center;
-}
-
-.edit-profile {
-background-color: #e4e6eb;
-color: black;
-margin-left: 10px;
-}
-
-.add-story i, .edit-profile i {
-margin-right: 5px;
-}
-
-.profile-nav {
-display: flex;
-justify-content: space-around;
-background-color: #f0f2f5;
-padding: 10px;
-}
-
-.profile-nav a {
-color: #606770;
-text-decoration: none;
-padding: 5px 10px;
-border-radius: 5px;
-transition: background-color 0.3s ease;
-}
-
-.profile-nav a:hover {
-background-color: #e4e6eb;
-}
-
-/* Sección de Detalles y Publicaciones */
-.main-content {
-display: flex;
-margin-top: 20px;
-}
-
-.sidebar {
-width: 30%;
-background-color: white;
-border-radius: 8px;
-padding: 20px;
-margin-right: 20px;
-}
-
-.sidebar h2 {
-font-size: 18px;
-color: #606770;
-margin-bottom: 15px;
-}
 
 .sidebar button {
 display: block;
@@ -338,55 +186,6 @@ cursor: pointer;
 font-weight: bold;
 }
 
-.posts {
-width: 70%;
-}
-
-.new-post {
-background-color: white;
-border-radius: 8px;
-padding: 20px;
-margin-bottom: 20px;
-display: flex;
-align-items: center;
-}
-
-.post-input {
-width: 100%;
-padding: 10px;
-border: none;
-border-radius: 20px;
-background-color: #f0f2f5;
-margin-left: 10px;
-}
-
-.post-options button {
-background-color: #e4e6eb;
-color: #606770;
-padding: 5px 10px;
-border: none;
-border-radius: 5px;
-margin-top: 10px;
-margin-right: 5px;
-cursor: pointer;
-display: flex;
-align-items: center;
-}
-
-.post-options i {
-margin-right: 5px;
-}
-
-.post {
-background-color: white;
-border-radius: 8px;
-padding: 20px;
-}
-
-.post h3 {
-font-size: 18px;
-color: #606770;
-}
 
 .post button {
 background-color: #e4e6eb;
@@ -461,8 +260,8 @@ animation: container-appear 0.6s ease-out;
 
 /* Panel lateral informativo */
 .info-container {
-  background: linear-gradient(270deg, #813db1b4, #301b70);
-  color: white;
+  background: linear-gradient(270deg, #3b3b3b6a, #5d5d5d);
+  color: rgb(0, 0, 0);
   padding: 50px;
   width: 65%;
   /* max-width: 450px; */
@@ -524,7 +323,6 @@ select {
 
 input:focus,
 select:focus {
-  border-color: #6C63FF;
   box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
 }
 
@@ -556,7 +354,7 @@ select:focus {
 button {
   width: 420%;
   padding: 1rem;
-  background: #6C63FF;
+  background: #808080;
   color: white;
   border: none;
   border-radius: 8px;
@@ -567,7 +365,7 @@ button {
 }
 
 button:hover {
-  background: #5650d8;
+  background: #4f4f4f;
   transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
 
@@ -575,7 +373,7 @@ button:hover {
 
 /* Enlaces */
 a {
-  color: #6C63FF;
+  color: #a4a4a5;
   text-decoration: none;
   display: block;
   text-align: center;
@@ -584,7 +382,7 @@ a {
 }
 
 a:hover {
-  color: #5650d8;
+  color: #61606c;
 }
 
 /* Animaciones de los inputs */
@@ -624,7 +422,7 @@ a:hover {
 /* Estilos adicionales para mejorar la accesibilidad */
 input:focus-visible,
 select:focus-visible {
-  outline: 2px solid #6C63FF;
+  outline: 2px solid #5d5d5e;
   outline-offset: 1px;
 }
 
@@ -642,3 +440,24 @@ input:-webkit-autofill:focus {
   -webkit-text-fill-color: #333;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+
+/* Mensaje de bienvenida */
+.welcome-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra la imagen horizontalmente */
+  justify-content: center; /* Centra verticalmente si es necesario */
+}
+
+/* Imagen dentro del mensaje */
+.welcome-message img {
+  width: 400px; /* Ajusta el tamaño de la imagen */
+  height: auto; /* Mantiene la proporción */
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 10px 0; /* Espaciado opcional */
+}
+

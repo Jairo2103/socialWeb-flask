@@ -11,12 +11,13 @@
         {% if friends %}
             {% for friend in friends %}
                 <div class="contenido_amigos">
-                    <img src="{{ url_for('static', filename='public/' + friend.foto_perfil) if friend.foto_perfil else 'https://via.placeholder.com/100' }}"
+                    <img src="/uploads/profile/{{friend.foto_perfil}}"
                         alt="{{ friend.nombre }}"
                         class="foto_perfil_amigos"
                         style="width: 150px; height: 150px; object-fit: cover">
                     <div class="nombre_solicitud">
-                        <h6 class="mb-55">{{ friend.nombre }}</h6>
+                        <h6 class="mb-55">{{ friend.nombre }} {{ friend.apellido }}</h6>
+                        <a href="{{ url_for('eliminar_amigo', amigo_id=friend.id_usuario) }}" class="btn btn-danger btn-sm">Eliminar</a>
                     </div>
                 </div>
             {% endfor %}

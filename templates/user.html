@@ -20,7 +20,7 @@
                 <div class="navbar">
                     <div class="navbar-left" style="height: 45px;">
                         <input type="text" id="searchInput" placeholder="Search">
-                        <img src="{{ url_for('static', filename='img/111.PNG') }}" alt="" width="55" height="55"
+                        <img src="{{ url_for('static', filename='css/imgen/111.PNG') }}" alt="" width="55" height="55"
                             style="vertical-align: middle;margin-top: -55px;margin-left: 25px;">
                     </div>
 
@@ -45,8 +45,8 @@
                             <i class="fas fa-envelope"></i>
                         </a>
                         <a href="{{ url_for('Usuario')}}" class="nav-icon">
-                            <img src="{{ url_for('static', filename='img/placeholder.jpg') }}" class="rounded-circle me-2" style="width: 30px;height: 30px;margin-top: 0.1px; object-fit: cover;">
-                            {{ current_user.nonmbre if current_user.is_authenticated else 'Nombre' }}
+                            <img src="{{ url_for('download_file', filename='profile/' + (current_user.foto_perfil)) }}" class="rounded-circle me-2" style="width: 30px;height: 30px;margin-top: 0.1px; object-fit: cover;">
+                            {{ current_user.nombre if current_user.is_authenticated else 'Nombre' }}
                         </a>
                     </div>
                 </div>
@@ -62,42 +62,69 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const notificationButton = document.querySelector('[data-bs-target="#notificationsModal"]');
             const notificationList = document.getElementById('notificationList');
             const notificationCount = document.getElementById('notificationCount');
             const searchInput = document.getElementById('searchInput');
             const searchResultsList = document.getElementById('searchResultsList');
-    
-            function searchResults() {
-                const query = searchInput.value;
-    
-                if (query.length > 2) {
-                    fetch(`/buscar-usuario?query=${encodeURIComponent(query)}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.error) {
-                                searchResultsList.innerHTML = `<p class="text-danger">${data.error}</p>`;
-                            } else {
-                                searchResultsList.innerHTML = ''; 
-                                data.forEach(result => {
-                                    let resultElement = document.createElement('li');
-                                    resultElement.classList.add('search-result-item', 'mb-2');
-                                    resultElement.innerHTML = `
-                                        <a href="/perfil/${result.id_usuario}" class="text-decoration-none text-dark">
-                                            <i class="fas fa-user-circle me-2"></i> ${result.nombre}
-                                        </a>
-                                    `;
-                                    searchResultsList.appendChild(resultElement); 
-                                });
-                            }
-                        });
-                } else {
-                    searchResultsList.innerHTML = ''; 
+            const amigosLista = document.getElementById("amigosLista");
+
+
+            async function fetchApi(url, options = {}) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        throw new Error(`Error del servidor: ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    console.error(`Error al realizar la solicitud a ${url}:`, error);
+                    throw error;
                 }
             }
-            
+
+
+            async function searchResults() {
+                const query = searchInput.value.trim();
+
+                if (query.length > 2) {
+                    try {
+                        const response = await fetch(`/buscar_usuario?query=${encodeURIComponent(query)}`);
+                        const data = await response.json();
+
+                        searchResultsList.innerHTML = ''; // Limpiar resultados previos
+
+                        if (response.ok) {
+                            data.forEach(result => {
+                                const resultElement = document.createElement('li');
+                                resultElement.classList.add('search-result-item', 'mb-2');
+                                resultElement.innerHTML = `
+                        <a href="/perfil/${result.id_usuario}" class="text-decoration-none">
+                            <i class="fas fa-user-circle me-2"></i> ${result.nombre} ${result.apellidos}
+                        </a>
+                    `;
+                                searchResultsList.appendChild(resultElement);
+                            });
+                        } else {
+                            searchResultsList.innerHTML = `<p class="text-danger">${data.error}</p>`;
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        searchResultsList.innerHTML = `<p class="text-danger">Error al buscar usuarios.</p>`;
+                    }
+                } else {
+                    searchResultsList.innerHTML = ''; // Vaciar resultados si no hay suficientes caracteres
+                }
+            }
+
+            // Asociar el evento al input de búsqueda
             searchInput.addEventListener('input', searchResults);
+
+
+
+
+            
         });
     </script>
 </body>
