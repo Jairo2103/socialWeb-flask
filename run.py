@@ -25,8 +25,8 @@ import os
 app.config["SECRET_KEY"] = os.urandom(24)
 app.config["MYSQL_HOST"] = "localhost"
 app.config["MYSQL_USER"] = "root"
-app.config["MYSQL_PASSWORD"] = ""
-app.config["MYSQL_DB"] = "red_social"
+app.config["MYSQL_PASSWORD"] = "12345"
+app.config["MYSQL_DB"] = "red_social_2"
 app.config["UPLOAD_POSTS_FOLDER"] = "uploads/posts"  # Carpeta para fotos de publicaciones
 UPLOAD_FOLDER = 'uploads'
 app.config["ALLOWED_EXTENSIONS"] = {"jpeg", "png", "jpg", "gif", "jfif"}
@@ -815,6 +815,65 @@ def obtener_amigos():
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/chat/<int:user_id>")
+@login_required
+def chat(user_id):
+    try:
+        # Primera conexión para información del usuario
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM Usuario WHERE id_usuario = %s', [user_id])
+        chat_user = cursor.fetchone()
+        cursor.close()
+
+        # Segunda conexión para mensajes
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.callproc('sp_Mensaje_VerConversacion', [current_user.id, user_id])
+        mensajes = cursor.fetchall()
+        cursor.close()
+
+        # Tercera conexión para lista de amigos
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.callproc('sp_Amigos_ConMensajes', [current_user.id])
+        amigos = cursor.fetchall()
+        cursor.close()
+
+        if chat_user:
+            return render_template("chat.html", 
+                                chat_user=chat_user,
+                                mensajes=mensajes,
+                                amigos=amigos)
+        return redirect(url_for('feed'))
+        
+    except Exception as e:
+        print(f"Error: {e}")
+        return redirect(url_for('feed'))
+
+@app.route("/chat/<int:user_id>/enviar", methods=['POST'])
+@login_required
+def enviar_mensaje(user_id):
+    data = request.get_json()
+    mensaje = data.get('mensaje')
+    
+    if mensaje:
+        cursor = mysql.connection.cursor()
+        cursor.callproc('sp_Mensaje_Enviar', [current_user.id, user_id, mensaje])
+        mysql.connection.commit()
+        cursor.close()
+        return jsonify({'success': True})
+    return jsonify({'success': False})
+
+@app.route("/chat/<int:user_id>/actualizar", methods=['GET'])
+@login_required
+def actualizar_mensajes(user_id):
+    ultimo_id = request.args.get('ultimo_id', 0, type=int)
+    
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.callproc('sp_Mensaje_MarcarComoLeidos', [current_user.id, user_id, ultimo_id])
+    mensajes_nuevos = cursor.fetchall()
+    cursor.close()
+    
+    return jsonify({'mensajes': mensajes_nuevos})
 
 # Ruta de cierre de sesión
 @app.route("/logout")

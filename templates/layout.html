@@ -38,8 +38,7 @@
                             <i class="fas fa-bell"></i>
                             <span class="badge bg-danger" id="notificationCount">3</span>
                         </a>
-                        <a href="#" class="nav-icon" data-bs-toggle="modal" data-bs-target="#messageModal">
-                            <i class="fas fa-envelope"></i></a>
+                        
                         <a href="{{ url_for('Usuario')}}" class="nav-icon">
                             <img src="{{ url_for('download_file', filename='profile/' + (current_user.foto_perfil)) }}"
                                 class="rounded-circle me-2"
@@ -76,12 +75,21 @@
 
             <div class="col-md-3 right-sidebar">
                 <h5>Contactos</h5>
-                <ul id="amigosLista" class="list-unstyleded">
+                <ul id="amigosLista" class="list-unstyled">
                     {% for amigo in amigos %}
-                    <li class="contact-item d-flex align-items-center mb-2">
-                        <img src="/uploads/profile/{{amigo.foto_perfil }}" alt="Foto de {{ amigo.nombre }}"
-                            class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
-                        <span>{{ amigo.nombre }}</span>
+                    <li class="contact-item d-flex align-items-center mb-2" 
+                        onclick="window.location.href='{{ url_for('chat', user_id=amigo.id_usuario) }}'" 
+                        style="cursor: pointer;">
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <img src="/uploads/profile/{{ amigo.foto_perfil }}" 
+                                 alt="Foto de {{ amigo.nombre }}"
+                                 class="rounded-circle me-2" 
+                                 style="width: 40px; height: 40px; object-fit: cover;">
+                            <span>{{ amigo.nombre }}</span>
+                        </div>
+                        {% if amigo.mensajes_nuevos and amigo.mensajes_nuevos > 0 %}
+                        <span class="badge bg-primary rounded-pill">{{ amigo.mensajes_nuevos }}</span>
+                        {% endif %}
                     </li>
                     {% endfor %}
                 </ul>
