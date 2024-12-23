@@ -486,7 +486,6 @@ a.text-decoration-none:hover {
 #searchResults {
     position: absolute;
     width: 20%;
-    border: 1px solid #dddddd31;
     max-height: 200px;
     overflow-y: auto;
     z-index: 9999;
@@ -498,7 +497,7 @@ a.text-decoration-none:hover {
     display: block;
     position: absolute;
     width: 20%;
-    border: 1px solid rgb(221 221 221 / 12%);
+    
     max-height: 200px;
     overflow-y: auto;
     margin-left: 82px;
@@ -609,6 +608,13 @@ a.text-decoration-none {
     background-color: #f7f6f6;
     color: rgb(29, 29, 29);
 }
+
+
+
+.text-dark {
+    --bs-text-opacity: 1;
+}
+
 
 
 
