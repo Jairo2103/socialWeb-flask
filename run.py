@@ -433,7 +433,8 @@ def amigos():
         FROM amigos
         JOIN usuario
         ON (amigos.id_usuario1 = usuario.id_usuario AND amigos.id_usuario2 = %s)
-        OR (amigos.id_usuario2 = usuario.id_usuario AND amigos.id_usuario1 = %s);
+        OR (amigos.id_usuario2 = usuario.id_usuario AND amigos.id_usuario1 = %s)
+        WHERE amigos.estado = 'aceptado'; 
         """
     cursor.execute(query, (id_usuario, id_usuario))
         
@@ -498,29 +499,21 @@ def perfil(id_usuario):
 
 @app.route('/enviar_solicitudes')
 def enviar_solicitudes():
-    id_usuario = session.get('id_usuario')
-    if not id_usuario:
-        return "Usuario no autenticado", 401
+    try:
+        id_usuario = session.get('id_usuario')
+        if not id_usuario:
+            return "Usuario no autenticado", 401
 
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
-        # Consulta para obtener usuarios a quienes enviar solicitudes
-    query = """
-        SELECT usuario.*
-        FROM usuario
-        WHERE id_usuario != %s
-        AND id_usuario NOT IN (
-            SELECT id_usuario2
-            FROM amigos
-            WHERE id_usuario1 = %s
-        );
-        """
-    cursor.execute(query, (id_usuario, id_usuario))
-    users = cursor.fetchall()
-
-    cursor.close()
-    return render_template('EnviarSolicitudes.html', users=users)
-
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.callproc('ListarUsuariosDisponibles', [id_usuario])
+        users = cursor.fetchall()
+        cursor.close()
+        
+        return render_template('EnviarSolicitudes.html', users=users)
+    except Exception as e:
+        app.logger.error(f"Error en /enviar_solicitudes: {str(e)}")
+        return "Error interno del servidor", 500
+    
 @app.route('/enviar_solicitud/<int:receiver_id>', methods=['POST'])
 def enviar_solicitud(receiver_id):
     
@@ -543,8 +536,12 @@ def enviar_solicitud(receiver_id):
             return jsonify({"message": "Ya existe una solicitud pendiente"}), 400
 
         # Llamar al procedimiento almacenado
-        cursor.callproc('EnviarSolicitud', [sender_id, receiver_id])
-        mysql.connection.commit()
+        try:
+            cursor.callproc('EnviarSolicitud', [sender_id, receiver_id])
+            mysql.connection.commit()
+        except Exception as e:
+            mysql.connection.rollback()
+            return jsonify({"message": f"Error al enviar solicitud: {str(e)}"}), 500
 
         cursor.close()
         return jsonify({"message": "Solicitud enviada exitosamente"}), 200
@@ -578,28 +575,23 @@ def accept_request(sender_id):
         if not receiver_id:
             return jsonify({"message": "Usuario no autenticado"}), 401
 
-        conn = mysql.connection
-        cursor = conn.cursor(MySQLdb.cursors.DictCursor)
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         
-        responseMessage = ""
+        cursor.execute("SET @message = '';")
 
         # Llamar al procedimiento almacenado para aceptar la solicitud
-        cursor.callproc('AceptarSolicitud', [sender_id, receiver_id, responseMessage])
-
-        # Ejecutar una consulta para obtener el valor del parámetro de salida
-        cursor.execute("SELECT @responseMessage AS message;")
-        response = cursor.fetchone()
-        
+        cursor.callproc('AceptarSolicitud', [sender_id, receiver_id, '@message'])
         mysql.connection.commit()
 
-        # Obtener el mensaje de respuesta
-        cursor.execute("SELECT @responseMessage AS message;")
-        response = cursor.fetchone()
+        # Ejecutar una consulta para obtener el valor del parámetro de salida
+        cursor.execute("SELECT @message AS message;")
+        result = cursor.fetchone()
+        message = result['message'] if result and result['message'] else 'Solicitud procesada'
+        
 
         cursor.close()
-        return jsonify({"message": response['message']}), 200
-
-
+        return jsonify({"message": message}), 200
+    
 @app.route("/actualizar_foto_perfil", methods=["POST"])
 def actualizar_foto_perfil():
     id_usuario = session.get('id_usuario')
@@ -667,7 +659,6 @@ def editar_perfil():
     apellidos = request.form["apellidos"]
     fecha_nacimiento = request.form["fecha_nacimiento"]
     genero = request.form["genero"]
-    email = request.form["email"]
 
     try:
         
@@ -675,24 +666,29 @@ def editar_perfil():
         cursor = mysql.connection.cursor()
 
         cursor.callproc(
-            "ActualizarPerfilUsuario(:user_id, :nombre, :apellidos, :fecha_nacimiento, :genero, :email)",
-            {
-                "user_id": current_user.id,
-                "nombre": nombre,
-                "apellidos": apellidos,
-                "fecha_nacimiento": fecha_nacimiento,
-                "genero": genero,
-                "email": email,
-            },
+            "ActualizarPerfilUsuario", (current_user.id, nombre, apellidos,fecha_nacimiento, genero)
         )
-        mysql.connection.commit()
+        
+        current_user.nombre = nombre
+        current_user.apellidos = apellidos
+        current_user.fecha_nacimiento = fecha_nacimiento
+        current_user.genero = genero
+        
+        mysql.connection.commit()  # Confirmar los cambios en la base de datos
 
         flash("Perfil actualizado exitosamente", "success")
-    except Exception as e:
-        mysql.connection.rollback()
-        flash(f"Error al actualizar el perfil: {str(e)}", "error")
+        
+        # Redirigir al perfil del usuario para mostrar los cambios
+        return redirect(url_for('Usuario'))
 
-    return redirect(url_for("Usuario"))
+    except Exception as e:
+        mysql.connection.rollback()  # Revertir en caso de error
+        flash(f"Error al actualizar el perfil: {str(e)}", "error")
+        
+        # Redirigir de nuevo al perfil del usuario en caso de error
+        return redirect(url_for('Usuario'))
+
+    
 
 @app.route('/buscar_usuario', methods=['GET'])
 def buscar_usuario():
@@ -757,7 +753,7 @@ def eliminar_amigo(amigo_id):
     cursor.close()
 
     flash("Amigo eliminado con éxito.", "success")
-    return redirect(url_for('Usuario'))
+    return redirect(url_for('amigos'))
 
 @app.route("/Usuario", methods=["GET"])
 def Usuario():

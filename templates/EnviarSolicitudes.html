@@ -9,7 +9,7 @@
     <br>
 
     <div class="contenedor_amigos">
-    {% if requests|length > 0 %}
+    {% if users|length > 0 %}
         {% for user in users %}
             <div class="contenido_amigos">
                 <img src="/uploads/profile/{{user.foto_perfil}}"
@@ -24,6 +24,7 @@
         {% endfor %}
     {% else %}
         <p>No hay solicitudes por el momento.</p>
+
     {% endif %}
     </div>
 

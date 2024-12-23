@@ -29,15 +29,27 @@
 <script>
     function acceptFriendRequest(senderId) {
         fetch(`/aceptar_solicitud/${senderId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // Flask no utiliza CSRF por defecto, pero si tienes CSRF habilitado, ajusta el token correctamente
-                }
-            })
-            .then(response => response.json())
-            .then(data => alert(data.message))
-            .catch(error => console.error(error));
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            if (data.message.includes('Solicitud Aceptada')) {
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al procesar la solicitud');
+        });
     }
 </script>
 
