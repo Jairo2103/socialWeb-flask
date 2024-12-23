@@ -28,13 +28,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const messagesDiv = document.getElementById('messages');
     const messageForm = document.getElementById('messageForm');
     let lastMessageId = {{ mensajes[-1].id_mensaje if mensajes else 0 }};
+    let isSending = false;
 
     messageForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        if (isSending) return;
+        
         const messageInput = document.getElementById('message');
         const message = messageInput.value.trim();
         
         if (message) {
+            isSending = true;
+            
             fetch('{{ url_for("enviar_mensaje", user_id=chat_user.id_usuario) }}', {
                 method: 'POST',
                 headers: {
@@ -45,19 +51,15 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const messageElement = document.createElement('div');
-                    messageElement.className = 'message sent';
-                    messageElement.innerHTML = `
-                        <div class="message-header">
-                            <strong>Tú</strong>
-                        </div>
-                        <p>${message}</p>
-                        <small>${new Date().toLocaleTimeString()}</small>
-                    `;
-                    messagesDiv.appendChild(messageElement);
                     messageInput.value = '';
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                    actualizarMensajes();
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                isSending = false;
             });
         }
     });
@@ -66,13 +68,13 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`{{ url_for("actualizar_mensajes", user_id=chat_user.id_usuario) }}?ultimo_id=${lastMessageId}`)
         .then(response => response.json())
         .then(data => {
-            if (data.mensajes.length > 0) {
+            if (data.mensajes && data.mensajes.length > 0) {
                 data.mensajes.forEach(mensaje => {
                     const messageElement = document.createElement('div');
                     messageElement.className = `message ${mensaje.id_usuario == {{ current_user.id }} ? 'sent' : 'received'}`;
                     messageElement.innerHTML = `
                         <div class="message-header">
-                            <strong>${mensaje.id_usuario == {{ current_user.id }} ? 'Tú' : chat_user.nombre}</strong>
+                            <strong>${mensaje.id_usuario == {{ current_user.id }} ? 'Tú' : '{{ chat_user.nombre }}'}</strong>
                         </div>
                         <p>${mensaje.contenido}</p>
                         <small>${new Date(mensaje.fecha).toLocaleTimeString()}</small>
@@ -85,7 +87,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    setInterval(actualizarMensajes, 3000);
+    // Actualizar mensajes cada 2 segundos
+    setInterval(actualizarMensajes, 2000);
+    
+    // Scroll inicial al fondo
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 });
 </script>
