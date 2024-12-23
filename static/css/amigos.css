@@ -442,21 +442,19 @@ a.text-decoration-none:hover {
 }
 #searchResults {
     position: absolute;
-    background-color: rgb(78, 78, 78);
     width: 20%;
-    border: 1px solid #dddddd31;
     max-height: 200px;
     overflow-y: auto;
     z-index: 9999;
     
-
+    /* Asegurarse de que se superponga sobre otros elementos */
 }
 
 .SearchResults {
     display: block;
     position: absolute;
     width: 20%;
-    border: 1px solid rgb(221 221 221 / 12%);
+    
     max-height: 200px;
     overflow-y: auto;
     margin-left: 82px;
@@ -472,7 +470,6 @@ a.text-decoration-none:hover {
     background-color: #f7f6f6;
     color: rgb(29, 29, 29);
 }
-
 .list-unstyled {
     padding-left: 0;
     list-style: none;
@@ -514,11 +511,6 @@ a.text-decoration-none {
 
 
 
-
-
-
-
-
-
-
-
+.text-dark {
+    --bs-text-opacity: 1;
+}
